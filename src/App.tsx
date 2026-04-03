@@ -1,21 +1,9 @@
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 import { Suspense } from "react";
 import ErrorBoundary from "@/components/ErrorBoundary";
 import ErrorFallback from "@/components/ui/ErrorFallback";
-import SkeletonGrid from "@/components/ui/SkeletonGrid";
 import ListPage from "./pages/ListPage";
 import DetailPage from "./pages/DetailPage";
-
-const queryClient = new QueryClient({
-  defaultOptions: {
-    queries: {
-      staleTime: 5 * 60 * 1000,
-      gcTime: 10 * 60 * 1000,
-      retry: 2,
-    },
-  },
-});
 
 function DetailSkeleton() {
   return (
@@ -46,30 +34,28 @@ function DetailSkeleton() {
 }
 
 const App = () => (
-  <QueryClientProvider client={queryClient}>
-    <BrowserRouter>
-      <Routes>
-        <Route
-          path="/"
-          element={
-            <ErrorBoundary fallback={(props) => <ErrorFallback {...props} />}>
-              <ListPage />
-            </ErrorBoundary>
-          }
-        />
-        <Route
-          path="/pokemon/:id"
-          element={
-            <ErrorBoundary fallback={(props) => <ErrorFallback {...props} />}>
-              <Suspense fallback={<DetailSkeleton />}>
-                <DetailPage />
-              </Suspense>
-            </ErrorBoundary>
-          }
-        />
-      </Routes>
-    </BrowserRouter>
-  </QueryClientProvider>
+  <BrowserRouter>
+    <Routes>
+      <Route
+        path="/"
+        element={
+          <ErrorBoundary fallback={(props) => <ErrorFallback {...props} />}>
+            <ListPage />
+          </ErrorBoundary>
+        }
+      />
+      <Route
+        path="/pokemon/:id"
+        element={
+          <ErrorBoundary fallback={(props) => <ErrorFallback {...props} />}>
+            <Suspense fallback={<DetailSkeleton />}>
+              <DetailPage />
+            </Suspense>
+          </ErrorBoundary>
+        }
+      />
+    </Routes>
+  </BrowserRouter>
 );
 
 export default App;

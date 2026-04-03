@@ -12,16 +12,16 @@ export default function DetailPage() {
   const sprite = pokemon.sprites.other['official-artwork'].front_default;
 
   return (
-    <div className="min-h-screen bg-lavender py-8 px-4">
+    <div className="min-h-screen bg-[#FDFCFE] py-8 px-4">
       <div className="max-w-4xl mx-auto">
-        <Link to="/" className="inline-flex items-center gap-1 text-muted-foreground hover:text-foreground transition-colors mb-6">
-          ← Back to List
+        <Link to="/" className="inline-flex items-center gap-2 text-muted-foreground hover:text-primary font-medium transition-all mb-8 group">
+          <span className="group-hover:-translate-x-1 transition-transform">←</span> Back to List
         </Link>
 
         {/* Header banner */}
-        <div className="gradient-header rounded-t-xl p-6 text-center">
-          <h1 className="text-2xl md:text-3xl font-bold text-primary-foreground capitalize">⚡ {pokemon.name}</h1>
-          <p className="text-primary-foreground/80">{number}</p>
+        <div className="bg-gradient-to-r from-[#6366f1] to-[#a855f7] rounded-t-3xl p-8 text-center shadow-xl">
+          <h1 className="text-3xl md:text-4xl font-black text-white capitalize tracking-tight drop-shadow-sm">⚡ {pokemon.name}</h1>
+          <p className="text-white/90 font-mono mt-1 text-lg">{number}</p>
         </div>
 
         {/* Content card */}

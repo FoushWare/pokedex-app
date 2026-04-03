@@ -3,6 +3,7 @@ import { useSuspenseInfiniteQuery } from '@tanstack/react-query';
 import { usePokemonList } from '@/hooks/usePokemonList';
 import { fetchPokemonPage } from '@/api/pokemon';
 import { pokemonKeys } from '@/api/queryKeys';
+import { POKEMON_PER_PAGE } from '@/config/constants';
 import PokemonCard from '@/components/ui/PokemonCard';
 import SkeletonGrid from '@/components/ui/SkeletonGrid';
 import PokemonPagination from '@/components/ui/PokemonPagination';
@@ -12,7 +13,7 @@ type Mode = 'paginated' | 'infinite';
 function PaginatedList() {
   const [page, setPage] = useState(1);
   const { data } = usePokemonList(page);
-  const totalPages = Math.ceil(data.total / 20);
+  const totalPages = Math.ceil(data.total / POKEMON_PER_PAGE);
 
   return (
     <>
@@ -22,8 +23,8 @@ function PaginatedList() {
         ))}
       </div>
       <PokemonPagination currentPage={page} totalPages={totalPages} onPageChange={setPage} />
-      <p className="text-center text-sm text-muted-foreground mt-2">
-        Page {page} of {totalPages} ({data.total} Pokémon shown)
+      <p className="text-center text-sm text-muted-foreground mt-4 font-medium">
+        Page {page} of {totalPages} <span className="opacity-70">({POKEMON_PER_PAGE} Pokémon per page)</span>
       </p>
     </>
   );
@@ -35,7 +36,7 @@ function LoadMoreList() {
     queryFn: ({ pageParam }) => fetchPokemonPage(pageParam),
     initialPageParam: 1,
     getNextPageParam: (lastPage, _, lastPageParam) => {
-      const fetched = lastPageParam * 20;
+      const fetched = lastPageParam * POKEMON_PER_PAGE;
       return fetched < lastPage.total ? lastPageParam + 1 : undefined;
     },
   });
@@ -73,8 +74,8 @@ function LoadMoreList() {
         <p className="text-center text-muted-foreground mt-8 pb-8">All Pokémon loaded!</p>
       )}
 
-      <p className="text-center text-sm text-muted-foreground mt-2">
-        Showing {allPokemon.length} Pokémon
+      <p className="text-center text-sm text-muted-foreground mt-2 font-medium">
+        Showing {allPokemon.length} Pokémon <span className="opacity-70">({POKEMON_PER_PAGE} per load)</span>
       </p>
     </>
   );
@@ -84,10 +85,14 @@ export default function ListPage() {
   const [mode, setMode] = useState<Mode>('paginated');
 
   return (
-    <div className="min-h-screen bg-background py-8 px-4">
+    <div className={`min-h-screen transition-colors duration-500 py-8 px-4 ${
+      mode === 'paginated' ? 'bg-[#F8FBFF]' : 'bg-[#F6FFF8]'
+    }`}>
       <div className="max-w-6xl mx-auto">
         <h1 className="text-3xl font-bold text-center text-foreground mb-1">⚡ Pokédex</h1>
-        <p className="text-center text-muted-foreground mb-6">Discover and explore Pokémon with {mode === 'paginated' ? 'page controls' : 'load more button'}</p>
+        <p className="text-center text-muted-foreground mb-6 font-medium">
+          Discover and explore Pokémon with {mode === 'paginated' ? 'page controls' : 'load more button'}
+        </p>
 
         <div className="flex justify-center gap-2 mb-8">
           <button
