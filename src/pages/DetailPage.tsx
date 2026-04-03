@@ -1,8 +1,12 @@
 import { useParams, Link } from 'react-router-dom';
 import { usePokemonDetail } from '@/hooks/usePokemonDetail';
-import StatBar from '@/components/ui/StatBar';
+import PageLayout from '@/components/layout/PageLayout';
+import DetailHeader from '@/components/detail/DetailHeader';
+import PokemonImage from '@/components/detail/PokemonImage';
+import StatsSection from '@/components/detail/StatsSection';
+import AbilitiesSection from '@/components/detail/AbilitiesSection';
+import PhysicalInfo from '@/components/detail/PhysicalInfo';
 import TypeBadge from '@/components/ui/TypeBadge';
-import { Ruler, Weight } from 'lucide-react';
 
 export default function DetailPage() {
   const { id } = useParams<{ id: string }>();
@@ -12,74 +16,49 @@ export default function DetailPage() {
   const sprite = pokemon.sprites.other['official-artwork'].front_default;
 
   return (
-    <div className="min-h-screen bg-[#FDFCFE] py-8 px-4">
-      <div className="max-w-4xl mx-auto">
-        <Link to="/" className="inline-flex items-center gap-2 text-muted-foreground hover:text-primary font-medium transition-all mb-8 group">
-          <span className="group-hover:-translate-x-1 transition-transform">←</span> Back to List
-        </Link>
+    <PageLayout mode="detail">
+      <Link 
+        to="/" 
+        className="inline-flex items-center gap-2 text-gray-500 hover:text-black font-medium transition-all mb-8 group"
+      >
+        <span className="group-hover:-translate-x-1 transition-transform">←</span> Back to List
+      </Link>
 
-        {/* Header banner */}
-        <div className="bg-gradient-to-r from-[#6366f1] to-[#a855f7] rounded-t-3xl p-8 text-center shadow-xl">
-          <h1 className="text-3xl md:text-4xl font-black text-white capitalize tracking-tight drop-shadow-sm">⚡ {pokemon.name}</h1>
-          <p className="text-white/90 font-mono mt-1 text-lg">{number}</p>
-        </div>
+      <div className="max-w-4xl mx-auto shadow-xl rounded-2xl overflow-hidden animate-in fade-in slide-in-from-bottom-4 duration-500">
+        <DetailHeader name={pokemon.name} number={number} />
 
-        {/* Content card */}
-        <div className="bg-card rounded-b-xl shadow-lg p-6 md:p-8">
-          <div className="flex flex-col md:flex-row gap-8">
-            {/* Left */}
-            <div className="flex flex-col items-center gap-4 md:w-2/5">
-              <div className="w-48 h-48 rounded-full bg-muted flex items-center justify-center">
-                <img src={sprite} alt={pokemon.name} className="w-40 h-40 object-contain" />
-              </div>
-              <div className="flex gap-2">
+        <div className="bg-white p-8 md:p-10">
+          <div className="flex flex-col md:flex-row gap-12">
+            {/* Left Column: Visuals & Tags */}
+            <div className="flex flex-col items-center gap-6 md:w-2/5">
+              <PokemonImage src={sprite} alt={pokemon.name} />
+              
+              <div className="flex gap-2.5">
                 {pokemon.types.map((t) => (
                   <TypeBadge key={t.type.name} type={t.type.name} />
                 ))}
               </div>
-              <div className="flex gap-6 text-sm text-card-foreground">
-                <div className="flex items-center gap-1">
-                  <Ruler className="w-4 h-4 text-muted-foreground" />
-                  <span className="font-bold">{(pokemon.height / 10).toFixed(1)} m</span>
-                </div>
-                <div className="flex items-center gap-1">
-                  <Weight className="w-4 h-4 text-muted-foreground" />
-                  <span className="font-bold">{(pokemon.weight / 10).toFixed(1)} kg</span>
-                </div>
-              </div>
+
+              <PhysicalInfo height={pokemon.height} weight={pokemon.weight} />
             </div>
 
-            {/* Right */}
-            <div className="flex-1 space-y-6">
-              <div>
-                <h2 className="text-lg font-bold text-card-foreground mb-3">Base Stats</h2>
-                <div className="space-y-2">
-                  {pokemon.stats.map((s) => (
-                    <StatBar key={s.stat.name} label={s.stat.name} value={s.base_stat} />
-                  ))}
-                </div>
-              </div>
+            {/* Right Column: Detailed Stats */}
+            <div className="flex-1 space-y-8">
+              <StatsSection stats={pokemon.stats} />
+              <AbilitiesSection abilities={pokemon.abilities} />
 
-              <div>
-                <h2 className="text-lg font-bold text-card-foreground mb-2">Abilities</h2>
-                <ul className="space-y-1">
-                  {pokemon.abilities.map((a) => (
-                    <li key={a.ability.name} className="capitalize text-card-foreground">
-                      {a.ability.name.replace('-', ' ')}
-                      {a.is_hidden && <span className="text-muted-foreground text-xs ml-2">(hidden)</span>}
-                    </li>
-                  ))}
-                </ul>
-              </div>
-
-              <div>
-                <h2 className="text-lg font-bold text-card-foreground mb-1">Base Experience</h2>
-                <p className="text-xl font-bold text-xp-pink">{pokemon.base_experience} XP</p>
+              <div className="border-t border-gray-100 pt-6">
+                <h2 className="text-sm font-bold text-gray-400 uppercase tracking-widest mb-1">
+                  Base Experience
+                </h2>
+                <p className="text-3xl font-black text-pink-600 tracking-tighter">
+                  {pokemon.base_experience} XP
+                </p>
               </div>
             </div>
           </div>
         </div>
       </div>
-    </div>
+    </PageLayout>
   );
 }
