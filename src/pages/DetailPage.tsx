@@ -31,7 +31,7 @@ export default function DetailPage() {
           <div className="flex flex-col md:flex-row gap-12">
             {/* Left Column: Visuals & Tags */}
             <div className="flex flex-col items-center gap-6 md:w-2/5">
-              <PokemonImage src={sprite} alt={pokemon.name} />
+              <PokemonImage src={sprite} alt={pokemon.name} id={pokemon.id} />
               
               <div className="flex gap-2.5">
                 {pokemon.types.map((t) => (

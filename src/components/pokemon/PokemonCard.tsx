@@ -1,4 +1,4 @@
-import { memo, useState } from 'react';
+import { memo, useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import type { PokemonCardData } from '@/types/pokemon.types';
 
@@ -10,26 +10,33 @@ const PokemonCard = memo(function PokemonCard({ pokemon }: PokemonCardProps) {
   const [imageLoaded, setImageLoaded] = useState(false);
   const number = `#${String(pokemon.id).padStart(3, '0')}`;
 
+  // Reset loading state when pokemon changes
+  useEffect(() => {
+    setImageLoaded(false);
+  }, [pokemon.id]);
+
   return (
-    <Link to={`/pokemon/${pokemon.id}`} className="block">
-      <div className="bg-white rounded-xl shadow-sm hover:shadow-md transition-shadow p-4 flex flex-col items-center gap-3">
-        <div className="w-full aspect-[4/3] rounded-lg bg-gray-100 flex items-center justify-center relative overflow-hidden">
+    <Link to={`/pokemon/${pokemon.id}`} className="block group">
+      <div className="bg-white rounded-xl shadow-sm hover:shadow-xl transition-all duration-300 p-4 flex flex-col items-center gap-3">
+        <div className="w-full aspect-[4/3] rounded-lg bg-gray-50 flex items-center justify-center relative overflow-hidden ring-1 ring-gray-100">
           {!imageLoaded && (
-            <div className="absolute inset-0 bg-gray-200 animate-pulse rounded-lg" />
+            <div className="absolute inset-0 bg-gray-100 animate-shimmer" />
           )}
           <img
             src={pokemon.sprite}
             alt={pokemon.name}
-            className={`w-28 h-28 object-contain transition-opacity duration-300 ${
-              imageLoaded ? 'opacity-100' : 'opacity-0'
+            className={`w-28 h-28 object-contain transition-all duration-700 ease-out ${
+              imageLoaded 
+                ? 'opacity-100 scale-100 translate-y-0' 
+                : 'opacity-0 scale-90 translate-y-2'
             }`}
             loading="lazy"
             onLoad={() => setImageLoaded(true)}
           />
         </div>
         <div className="text-center">
-          <h3 className="font-bold capitalize text-gray-900">{pokemon.name}</h3>
-          <span className="text-sm text-gray-500">{number}</span>
+          <h3 className="font-black capitalize text-gray-900 group-hover:text-black transition-colors">{pokemon.name}</h3>
+          <span className="text-sm font-mono text-gray-400 group-hover:text-gray-600 transition-colors">{number}</span>
         </div>
       </div>
     </Link>
