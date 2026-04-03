@@ -29,9 +29,7 @@ function PaginatedList() {
   );
 }
 
-function InfiniteList() {
-  const sentinelRef = useRef<HTMLDivElement>(null);
-
+function LoadMoreList() {
   const { data, fetchNextPage, hasNextPage, isFetchingNextPage } = useSuspenseInfiniteQuery({
     queryKey: [...pokemonKeys.lists(), 'infinite'],
     queryFn: ({ pageParam }) => fetchPokemonPage(pageParam),
@@ -44,23 +42,6 @@ function InfiniteList() {
 
   const allPokemon = data.pages.flatMap((p) => p.pokemon);
 
-  const handleObserver = useCallback(
-    (entries: IntersectionObserverEntry[]) => {
-      if (entries[0].isIntersecting && hasNextPage && !isFetchingNextPage) {
-        fetchNextPage();
-      }
-    },
-    [fetchNextPage, hasNextPage, isFetchingNextPage]
-  );
-
-  useEffect(() => {
-    const el = sentinelRef.current;
-    if (!el) return;
-    const observer = new IntersectionObserver(handleObserver, { threshold: 0.1 });
-    observer.observe(el);
-    return () => observer.disconnect();
-  }, [handleObserver]);
-
   return (
     <>
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
@@ -68,10 +49,30 @@ function InfiniteList() {
           <PokemonCard key={p.id} pokemon={p} />
         ))}
       </div>
-      <div ref={sentinelRef} className="h-10" />
-      {isFetchingNextPage && (
-        <p className="text-center text-muted-foreground mt-4 animate-pulse">Loading more Pokémon...</p>
+      
+      {hasNextPage && (
+        <div className="flex justify-center mt-12 pb-8">
+          <button
+            onClick={() => fetchNextPage()}
+            disabled={isFetchingNextPage}
+            className="px-8 py-3 bg-secondary text-secondary-foreground font-semibold rounded-full shadow-md hover:shadow-lg transition-all active:scale-95 disabled:opacity-50 disabled:active:scale-100 flex items-center gap-2"
+          >
+            {isFetchingNextPage ? (
+              <>
+                <span className="w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin" />
+                Loading...
+              </>
+            ) : (
+              'Load More'
+            )}
+          </button>
+        </div>
       )}
+
+      {!hasNextPage && (
+        <p className="text-center text-muted-foreground mt-8 pb-8">All Pokémon loaded!</p>
+      )}
+
       <p className="text-center text-sm text-muted-foreground mt-2">
         Showing {allPokemon.length} Pokémon
       </p>
@@ -86,33 +87,33 @@ export default function ListPage() {
     <div className="min-h-screen bg-background py-8 px-4">
       <div className="max-w-6xl mx-auto">
         <h1 className="text-3xl font-bold text-center text-foreground mb-1">⚡ Pokédex</h1>
-        <p className="text-center text-muted-foreground mb-6">Discover and explore Pokémon with {mode === 'paginated' ? 'page controls' : 'infinite scroll'}</p>
+        <p className="text-center text-muted-foreground mb-6">Discover and explore Pokémon with {mode === 'paginated' ? 'page controls' : 'load more button'}</p>
 
         <div className="flex justify-center gap-2 mb-8">
           <button
             onClick={() => setMode('paginated')}
             className={`px-4 py-2 text-sm font-medium rounded-md transition-colors ${
               mode === 'paginated'
-                ? 'bg-primary text-primary-foreground'
+                ? 'bg-primary text-primary-foreground font-bold'
                 : 'border border-border text-foreground hover:bg-muted'
             }`}
           >
-            Page Controls
+            Pagination
           </button>
           <button
             onClick={() => setMode('infinite')}
             className={`px-4 py-2 text-sm font-medium rounded-md transition-colors ${
               mode === 'infinite'
-                ? 'bg-primary text-primary-foreground'
+                ? 'bg-primary text-primary-foreground font-bold'
                 : 'border border-border text-foreground hover:bg-muted'
             }`}
           >
-            Infinite Scroll
+            Load More
           </button>
         </div>
 
         <Suspense fallback={<SkeletonGrid />}>
-          {mode === 'paginated' ? <PaginatedList /> : <InfiniteList />}
+          {mode === 'paginated' ? <PaginatedList /> : <LoadMoreList />}
         </Suspense>
       </div>
     </div>
