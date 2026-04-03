@@ -4,9 +4,6 @@ on:
   push:
     branches:
       - main
-  pull_request:
-    branches:
-      - main
 
 jobs:
   deploy:
@@ -19,12 +16,13 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 22
+          cache: 'npm'
 
       - name: Install Dependencies
-        run: npm install
+        run: npm ci
 
-      - name: Lint (Optional)
-        run: npm run build # We run build to ensure TS and Vite are valid
+      - name: Build and Verify
+        run: npm run build
 
       - name: Deploy to Vercel
         uses: amondnet/vercel-action@v25
