@@ -8,14 +8,10 @@ interface PageLayoutProps {
 export default function PageLayout({ children, mode = 'paginated' }: PageLayoutProps) {
   const getBackground = () => {
     switch (mode) {
-      case 'loadmore':
-        return 'bg-[#E8F5E9]'; // Strong mint green
-      case 'paginated':
-        return 'bg-[#F8FBFF]'; // Light lavender/blue
       case 'detail':
-        return 'bg-[#FDFCFE]'; // Clean detail page bg
+        return 'bg-[#FDFCFE] shadow-inner'; // Keep detail page clean
       default:
-        return 'bg-background';
+        return 'bg-background'; // Use the 140 40% 95% mint green
     }
   };
 
