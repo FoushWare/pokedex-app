@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 
 interface PokemonImageProps {
   src: string;
@@ -8,10 +8,15 @@ interface PokemonImageProps {
 
 export default function PokemonImage({ src, alt, id }: PokemonImageProps) {
   const [loaded, setLoaded] = useState(false);
+  const imgRef = useRef<HTMLImageElement>(null);
 
-  // Reset loading state when the id changes
+  // Reset/Check loading state when the id changes
   useEffect(() => {
-    setLoaded(false);
+    if (imgRef.current?.complete) {
+      setLoaded(true);
+    } else {
+      setLoaded(false);
+    }
   }, [id]);
 
   return (
@@ -20,12 +25,13 @@ export default function PokemonImage({ src, alt, id }: PokemonImageProps) {
         <div className="absolute inset-0 bg-gray-100 animate-shimmer" />
       )}
       <img
+        ref={imgRef}
         src={src}
         alt={alt}
-        className={`w-40 h-40 object-contain transition-all duration-1000 ease-out z-10 ${
+        className={`w-40 h-40 object-contain transition-all duration-300 ease-out z-10 ${
           loaded 
-            ? 'opacity-100 scale-100 translate-y-0' 
-            : 'opacity-0 scale-75 translate-y-4'
+            ? 'opacity-100 scale-100' 
+            : 'opacity-0 scale-75'
         }`}
         onLoad={() => setLoaded(true)}
       />

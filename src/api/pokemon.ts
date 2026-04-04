@@ -10,11 +10,10 @@ export async function fetchPokemonDetail(id: string | number): Promise<PokemonDe
   if (!res.ok) throw new Error(`Failed to fetch Pokémon #${id}`);
   return res.json();
 }
-export async function fetchPokemonPage(page: number, limit = POKEMON_PER_PAGE): Promise<{ pokemon: PokemonCardData[]; total: number }> {
+export async function fetchPokemonPage(page: number, limit = POKEMON_PER_PAGE): Promise<{ pokemon: PokemonCardData[]; total: number; details: PokemonDetail[] }> {
   const offset = (page - 1) * limit;
   const list = await fetchPokemonList(limit, offset);
   
-  // Extract real IDs from URLs to handle non-sequential or missing IDs
   const details = await Promise.all(
     list.results.map((result) => {
       const parts = result.url.split('/').filter(Boolean);
@@ -30,5 +29,6 @@ export async function fetchPokemonPage(page: number, limit = POKEMON_PER_PAGE): 
       sprite: d.sprites.other['official-artwork'].front_default
     })),
     total: list.count,
+    details,
   };
 }

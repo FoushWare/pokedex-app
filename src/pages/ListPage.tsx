@@ -1,5 +1,5 @@
 import { useState, Suspense, useCallback, useRef, useEffect } from 'react';
-import { useSuspenseInfiniteQuery } from '@tanstack/react-query';
+import { useSuspenseInfiniteQuery, useQueryClient } from '@tanstack/react-query';
 import { usePokemonList } from '@/hooks/usePokemonList';
 import { fetchPokemonPage } from '@/api/pokemon';
 import { pokemonKeys } from '@/api/queryKeys';
@@ -28,10 +28,18 @@ function PaginatedView() {
 }
 
 function InfiniteView() {
+  const queryClient = useQueryClient();
   const sentinelRef = useRef<HTMLDivElement>(null);
   const { data, fetchNextPage, hasNextPage, isFetchingNextPage } = useSuspenseInfiniteQuery({
     queryKey: [...pokemonKeys.lists(), 'infinite'],
-    queryFn: ({ pageParam }) => fetchPokemonPage(pageParam),
+    queryFn: async ({ pageParam }) => {
+      const data = await fetchPokemonPage(pageParam);
+      // Prime the cache for each pokemon detail
+      data.details.forEach((detail) => {
+        queryClient.setQueryData(pokemonKeys.detail(detail.id), detail);
+      });
+      return data;
+    },
     initialPageParam: 1,
     getNextPageParam: (lastPage, _, lastPageParam) => {
       const fetched = lastPageParam * POKEMON_PER_PAGE;

@@ -1,4 +1,4 @@
-import { memo, useState, useEffect } from 'react';
+import { memo, useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import type { PokemonCardData } from '@/types/pokemon.types';
 
@@ -8,11 +8,16 @@ interface PokemonCardProps {
 
 const PokemonCard = memo(function PokemonCard({ pokemon }: PokemonCardProps) {
   const [imageLoaded, setImageLoaded] = useState(false);
+  const imgRef = useRef<HTMLImageElement>(null);
   const number = `#${String(pokemon.id).padStart(3, '0')}`;
 
-  // Reset loading state when pokemon changes
+  // Reset/Check loading state when pokemon changes
   useEffect(() => {
-    setImageLoaded(false);
+    if (imgRef.current?.complete) {
+      setImageLoaded(true);
+    } else {
+      setImageLoaded(false);
+    }
   }, [pokemon.id]);
 
   return (
@@ -23,12 +28,13 @@ const PokemonCard = memo(function PokemonCard({ pokemon }: PokemonCardProps) {
             <div className="absolute inset-0 bg-gray-100 animate-shimmer" />
           )}
           <img
+            ref={imgRef}
             src={pokemon.sprite}
             alt={pokemon.name}
-            className={`w-28 h-28 object-contain transition-all duration-700 ease-out ${
+            className={`w-28 h-28 object-contain transition-all duration-300 ease-out ${
               imageLoaded 
-                ? 'opacity-100 scale-100 translate-y-0' 
-                : 'opacity-0 scale-90 translate-y-2'
+                ? 'opacity-100 scale-100' 
+                : 'opacity-0 scale-90'
             }`}
             loading="lazy"
             onLoad={() => setImageLoaded(true)}
