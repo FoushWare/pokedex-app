@@ -9,7 +9,7 @@ export default function PageLayout({ children, mode = 'paginated' }: PageLayoutP
   const getBackground = () => {
     switch (mode) {
       case 'detail':
-        return 'bg-[hsl(308,77%,40%)] shadow-inner'; // Specific royal purple for details
+        return 'bg-[hsl(var(--detail-background))] shadow-sm'; // Softer, lighter lavender background
       default:
         return 'bg-background'; // Use the 140 40% 95% mint green
     }
